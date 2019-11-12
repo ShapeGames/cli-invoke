@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 const inquirer = require('inquirer')
-const chalk = require('chalk')
-const figlet = require('figlet')
 const request = require('superagent')
 const commandLineArgs = require('command-line-args')
 const fs = require('fs')
@@ -15,15 +13,13 @@ const askQuestions = async (questions) => {
 }
 
 const loadFlow = (params) => {
-    console.log(
-        chalk.green(
-            figlet.textSync('Shape', {})
-        )
-    )
-    let rawdata = fs.readFileSync(params.config_file)
-    const config = JSON.parse(rawdata)
-    const defaultFlow = config.default_flow
-    return config.invoke_flows.find((flow) => flow.name === defaultFlow) || config.invoke_flows[0]
+    try {
+        let rawdata = fs.readFileSync(params.config_file)
+        return config = JSON.parse(rawdata)
+    } catch (err) {
+        console.log('Could not read the config file ' + params.config_file)
+        process.exit(1)
+    }
 }
 
 const iterate = (obj, valueMap) => {
@@ -62,43 +58,39 @@ const performAction = async (action) => {
     } catch (err) {
         console.log("Error making request: " + err)
     }
-
 }
 
 const optionDefinitions = [{
-        name: 'verbose',
-        alias: 'v',
-        type: Boolean,
-        defaultValue: false,
-        description: 'Make more noise'
-    },
-    {
-        name: 'help',
-        alias: 'h',
-        type: Boolean,
-        defaultValue: false,
-        description: 'To print this usage instruction'
-    },
-    {
         name: 'config_file',
         alias: 'c',
         type: String,
         defaultOption: true,
         defaultValue: 'cli-invoke-config.json',
         typeLabel: '{underline file}',
-        description: 'The JSON file with the definition of questions and action'
+        description: 'The JSON file with the definition of questions and action. Will look for cli-invoke-config.json in the current dir if not specified.'
+    }, {
+        name: 'help',
+        alias: 'h',
+        type: Boolean,
+        defaultValue: false,
+        description: 'To print this usage instruction'
+    }, {
+        name: 'verbose',
+        alias: 'v',
+        type: Boolean,
+        defaultValue: false,
+        description: 'Make more noise'
     },
 ]
 
 const parseParameters = () => {
-
     return commandLineArgs(optionDefinitions)
 }
 
 const printUsageInstructions = () => {
     const sections = [{
             header: 'cli-invoke',
-            content: ''
+            content: 'cli-invoke will ask questions defined in a configuration file and invoke a web hook based on your answers'
         },
         {
             header: 'Options',
