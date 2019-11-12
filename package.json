@@ -16,5 +16,6 @@
   },
   "bin": {
     "cli-invoke": "./index.js"
-  }
+  },
+  "repository": "https://github.com/olegam/cli-invoke"
 }
