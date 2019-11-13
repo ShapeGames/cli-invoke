@@ -5,6 +5,7 @@ const request = require('superagent')
 const commandLineArgs = require('command-line-args')
 const fs = require('fs')
 const commandLineUsage = require('command-line-usage')
+const branch = require('git-branch') // included so it can be used from defaultFunction in config
 
 const askQuestions = async (questions) => {
     const answers = await inquirer.prompt(questions)
@@ -12,10 +13,20 @@ const askQuestions = async (questions) => {
     return answers
 }
 
+const addDefaultFunctionSupport = (questions) => {
+    return questions.map((q) => {
+        if (q.defaultFunction) {
+            q.default = eval(q.defaultFunction)
+        }
+        return q
+    })
+}
 const loadFlow = (params) => {
     try {
         let rawdata = fs.readFileSync(params.config_file)
-        return config = JSON.parse(rawdata)
+        var config = JSON.parse(rawdata)
+        config.questions = addDefaultFunctionSupport(config.questions)
+        return config
     } catch (err) {
         console.log('Could not read the config file ' + params.config_file)
         process.exit(1)

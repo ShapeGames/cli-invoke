@@ -71,3 +71,19 @@ The format of your `cli-invoke-config.json` file should be similar to this examp
 The questions should be defined in the format of the [inquirer](https://github.com/SBoudrias/Inquirer.js) module. The possible question types are `input`, `number`, `confirm`, `list`, `rawlist`, `expand`, `checkbox`, `password`, `editor`.
 
 The action to perform after gathering your answers for all questions is defined in the `action` object. Currently the only supported action type is `http-request`. Placeholder values enclosed in curly braces such as `{BUILD_CONFIGURATION}` will be replaced by the answer to the question with that name.
+
+### Dynamic default values with defaultFunction
+It can be useful to prefil default values for questions in a dynamic way. E.g. use the current git branch or the contents of a file. The [inquirer](https://github.com/SBoudrias/Inquirer.js) format for defining questions support that a default value can be specified as a javascript function, but since the config file is in JSON format the function has to be passed as a string. This is possible by setting the `defaultFunction` property as a string containing a javascript function. A few examples:
+
+```
+{
+    "name": "BRANCH",
+    "type": "input",
+    "defaultFunction": "() => branch.sync()"
+},
+{
+    "name": "RELEASE_NOTE",
+    "type": "editor",
+    "defaultFunction": "() => fs.readFileSync('release_notes.txt')"
+}
+```
