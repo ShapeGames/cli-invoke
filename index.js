@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const inquirer = require('inquirer')
-const request = require('superagent')
-const commandLineArgs = require('command-line-args')
-const fs = require('fs')
-const commandLineUsage = require('command-line-usage')
-const branch = require('git-branch') // included so it can be used from defaultFunction in config
+import inquirer from 'inquirer';
+import request from 'superagent';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
+import fs from 'fs';
+import branch from 'git-branch'; // included so it can be used from defaultFunction in config
 
 const askQuestions = async (questions) => {
     const answers = await inquirer.prompt(questions)
