@@ -31,12 +31,22 @@ const addChoicesFunctionSupport = (questions) => {
     })
 }
 
+const mapWhenFunctions = (questions) => {
+    return questions.map((q) => {
+        return {
+            ...q,
+            when: eval(q.when)
+        }
+    })
+}
+
 const loadFlow = (params) => {
     try {
         let rawdata = fs.readFileSync(params.config_file)
         var config = JSON.parse(rawdata)
         config.questions = addDefaultFunctionSupport(config.questions)
         config.questions = addChoicesFunctionSupport(config.questions)
+        config.questions = mapWhenFunctions(config.questions)
         return config
     } catch (err) {
         console.log(err)

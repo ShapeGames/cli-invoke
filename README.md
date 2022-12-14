@@ -34,6 +34,15 @@ The format of your `cli-invoke-config.json` file should be similar to this examp
             ]
         },
         {
+            "name": "RELEASE_TYPE",
+            "type": "list",
+            "choices": [
+                "New",
+                "Update"
+            ],
+            "when": "(answers) => answers['BUILD_TARGET'] == 'Inhouse'"
+        },
+        {
             "name": "RELEASE_NOTE",
             "type": "editor"
         }
@@ -69,6 +78,8 @@ The format of your `cli-invoke-config.json` file should be similar to this examp
 ```
 
 The questions should be defined in the format of the [inquirer](https://github.com/SBoudrias/Inquirer.js) module. The possible question types are `input`, `number`, `confirm`, `list`, `rawlist`, `expand`, `checkbox`, `password`, `editor`.
+Note that not all values outlined in the format is directly supported. The values supported without any special work are those who are limited to a simple type only, such as strings, numbers or booleans.
+A few values support functions as well however there are some special cases such as `default` and `choices` where the spec is a little different from inquirer's that you can read about below. Do note that the different approach **only** applies when the value has multiple types including a function.
 
 The action to perform after gathering your answers for all questions is defined in the `action` object. Currently the only supported action type is `http-request`. Placeholder values enclosed in curly braces such as `{BUILD_CONFIGURATION}` will be replaced by the answer to the question with that name.
 
