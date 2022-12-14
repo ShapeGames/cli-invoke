@@ -87,3 +87,13 @@ It can be useful to prefil default values for questions in a dynamic way. E.g. u
     "defaultFunction": "() => fs.readFileSync('release_notes.txt')"
 }
 ```
+
+### Dynamic choices with choicesFunction
+Like `defaultFunction` it is also possible to provide choices as a result of a function. This is done by setting `choicesFunction` instead of `choices` and provide a function that returns an array of strings. Keep in mind however that the function is run when the config file is first parsed. This means the function is limited to computing the choices before the questions are asked.
+```
+{
+    "name": "TESTERS",
+    "type": "checkbox",
+    "choicesFunction": "() => JSON.parse(fs.readFileSync('app.config')).testers"
+}
+```

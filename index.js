@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const inquirer = require('inquirer')
-const request = require('superagent')
-const commandLineArgs = require('command-line-args')
-const fs = require('fs')
-const commandLineUsage = require('command-line-usage')
-const branch = require('git-branch') // included so it can be used from defaultFunction in config
+import inquirer from 'inquirer';
+import request from 'superagent';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
+import fs from 'fs';
+import branch from 'git-branch'; // included so it can be used from defaultFunction in config
 
 const askQuestions = async (questions) => {
     const answers = await inquirer.prompt(questions)
@@ -21,13 +21,25 @@ const addDefaultFunctionSupport = (questions) => {
         return q
     })
 }
+
+const addChoicesFunctionSupport = (questions) => {
+    return questions.map((q) => {
+        if (q.choicesFunction) {
+            q.choices = eval(q.choicesFunction)
+        }
+        return q
+    })
+}
+
 const loadFlow = (params) => {
     try {
         let rawdata = fs.readFileSync(params.config_file)
         var config = JSON.parse(rawdata)
         config.questions = addDefaultFunctionSupport(config.questions)
+        config.questions = addChoicesFunctionSupport(config.questions)
         return config
     } catch (err) {
+        console.log(err)
         console.log('Could not read the config file ' + params.config_file)
         process.exit(1)
     }
@@ -119,12 +131,17 @@ const run = async () => {
         return process.exit(0)
     }
     const flow = loadFlow(params)
-    const answers = await askQuestions(flow.questions)
-    const action = updateActionWithAnswers(flow.action, answers)
-    if (params.verbose) console.log('Performing action...\n' + JSON.stringify(action))
-    const result = await performAction(action)
-    const response = result.res
-    console.log('Response: ' + response.statusCode + ' ' + response.statusMessage + '\n' + response.text)
+    try {
+        const answers = await askQuestions(flow.questions)
+        const action = updateActionWithAnswers(flow.action, answers)
+        if (params.verbose) console.log('Performing action...\n' + JSON.stringify(action))
+        const result = await performAction(action)
+        const response = result.res
+        console.log('Response: ' + response.statusCode + ' ' + response.statusMessage + '\n' + response.text)
+    } catch (err) {
+        console.log(err.message)
+        process.exit(1)
+    }
 };
 
 run()
