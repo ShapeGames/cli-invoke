@@ -1,6 +1,6 @@
 {
   "name": "cli-invoke",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "cli-invoke will ask questions defined in a configuration file and invoke a web hook based on your answers",
   "main": "index.js",
   "type": "module",
@@ -10,11 +10,11 @@
   "author": "Ole Gammelgaard Poulsen",
   "license": "MIT",
   "dependencies": {
-    "command-line-args": "^5.1.1",
-    "command-line-usage": "^6.1.0",
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^6.1.3",
     "git-branch": "^2.0.1",
-    "inquirer": "^7.0.0",
-    "superagent": "^5.1.0"
+    "inquirer": "^9.1.4",
+    "superagent": "^8.0.6"
   },
   "bin": {
     "cli-invoke": "./index.js"
