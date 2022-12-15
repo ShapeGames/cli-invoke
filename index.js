@@ -77,6 +77,15 @@ const updateActionWithAnswers = (action, answers) => {
         Object.keys(answers).forEach((param) => {
             value = value.replace("{" + param + "}", answers[param])
         })
+
+        // Check if value is an unfulfilled parameter
+        // and substitute with null for better semantics
+        const re = /\{.*\}/
+        const match = value.match(re)
+        if (match) {
+            return null
+        }
+
         return value
     })
 }
@@ -113,6 +122,12 @@ const optionDefinitions = [{
         type: Boolean,
         defaultValue: false,
         description: 'Make more noise'
+    }, {
+        name: 'debug',
+        alias: 'd',
+        type: Boolean,
+        defaultValue: false,
+        description: 'Debug mode to omit things like running the action.'
     },
 ]
 
@@ -144,7 +159,8 @@ const run = async () => {
     try {
         const answers = await askQuestions(flow.questions)
         const action = updateActionWithAnswers(flow.action, answers)
-        if (params.verbose) console.log('Performing action...\n' + JSON.stringify(action))
+        if (params.verbose) console.log('Performing action...\n' + JSON.stringify(action, null, 2))
+        if (params.debug) { process.exit(0) }
         const result = await performAction(action)
         const response = result.res
         console.log('Response: ' + response.statusCode + ' ' + response.statusMessage + '\n' + response.text)

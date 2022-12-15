@@ -1,6 +1,6 @@
 {
   "name": "cli-invoke",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "cli-invoke will ask questions defined in a configuration file and invoke a web hook based on your answers",
   "main": "index.js",
   "type": "module",
