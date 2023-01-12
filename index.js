@@ -72,11 +72,28 @@ const iterate = (obj, valueMap) => {
     return res
 }
 
-const updateActionWithAnswers = (action, answers) => {
+const updateActionWithAnswers = (action, answers, questions) => {
     return iterate(action, (value) => {
         Object.keys(answers).forEach((param) => {
             value = value.replace("{" + param + "}", answers[param])
         })
+
+        // Check if value is an unfulfilled parameter (i.e. skipped by 'when')
+        // and substitute with a default value if available
+        const re = /(?<=\{).*(?=\})/
+        const match = value.match(re)
+        if (match) {
+            const param = match[0]
+            const q = questions.find(q => q.name == param)
+            if (q != null && q.default != undefined) {
+                if (typeof q.default === 'function') {
+                    value = value.replace("{" + param + "}", q.default())
+                } else {
+                    value = value.replace("{" + param + "}", q.default)
+                }
+            }
+        }
+
         return value
     })
 }
@@ -113,6 +130,12 @@ const optionDefinitions = [{
         type: Boolean,
         defaultValue: false,
         description: 'Make more noise'
+    }, {
+        name: 'debug',
+        alias: 'd',
+        type: Boolean,
+        defaultValue: false,
+        description: 'Debug mode to omit things like running the action.'
     },
 ]
 
@@ -143,8 +166,9 @@ const run = async () => {
     const flow = loadFlow(params)
     try {
         const answers = await askQuestions(flow.questions)
-        const action = updateActionWithAnswers(flow.action, answers)
-        if (params.verbose) console.log('Performing action...\n' + JSON.stringify(action))
+        const action = updateActionWithAnswers(flow.action, answers, flow.questions)
+        if (params.verbose) console.log('Performing action...\n' + JSON.stringify(action, null, 2))
+        if (params.debug) { process.exit(0) }
         const result = await performAction(action)
         const response = result.res
         console.log('Response: ' + response.statusCode + ' ' + response.statusMessage + '\n' + response.text)
