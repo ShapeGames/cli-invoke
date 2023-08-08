@@ -104,7 +104,13 @@ const performAction = async (action) => {
         process.exit(1)
     }
     try {
-        return request(action.method, action.url).send(action.json_body)
+        var r = request(action.method, action.url)
+        if (action.headers != undefined) {
+            Object.keys(action.headers).forEach(key => {
+                r.set(key, action.headers[key])
+            })
+        }
+        return r.send(action.json_body)
     } catch (err) {
         console.log("Error making request: " + err)
     }
