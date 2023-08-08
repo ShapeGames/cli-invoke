@@ -105,11 +105,9 @@ const performAction = async (action) => {
     }
     try {
         var r = request(action.method, action.url)
-        if (action.headers != undefined) {
-            Object.keys(action.headers).forEach(key => {
-                r.set(key, action.headers[key])
-            })
-        }
+        Object.keys(action.headers || {}).forEach(key => {
+            r.set(key, action.headers[key])
+        })
         return r.send(action.json_body)
     } catch (err) {
         console.log("Error making request: " + err)
